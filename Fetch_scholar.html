@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch-Scholar</title>
+    <style>
+        #navbar {
+            display: flex;
+            height: 55px;
+            align-items: center;
+            margin-top: 20px;
+            background-color: black;
+
+        }
+
+        #nav {
+            height: 350px;
+            margin-bottom: 20px;
+            background: url(https://i.pinimg.com/originals/39/5c/bd/395cbdc769cbbc96a8d123a5f1f16e80.jpg);
+        }
+
+        img {
+            width: 200px;
+            height: 300px;
+        }
+
+        #searchInput::before {
+            content: "🔎";
+            padding-right: 5px;
+        }
+
+        #searchInput {
+            width: 30%;
+            padding: 5px;
+            margin-left: 20%;
+            font-size: 20px;
+            border: 3px solid brown;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+        }
+
+        #searchbtn,
+        #sortBtn {
+            margin-left: 20px;
+            font-size: 22px;
+            padding: 5px;
+            width: 100px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 3px solid brown;
+            box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
+
+        }
+
+        #searchbtn:hover {
+            background-color: #f85b5b;
+
+        }
+        #sortBtn:hover{
+            background-color: #f85b5b;
+        }
+
+        #sortSelect {
+            margin-left: 20px;
+            font-size: 15px;
+            padding: 5px;
+            width: 130px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 3px solid brown;
+
+        }
+
+        #productDiv {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(4, 4fr);
+        }
+
+        .productCard {
+            max-width: 250px;
+            height: auto;
+            padding: 15px;
+            border: 1px solid #ccc;
+            margin: 10px;
+            border-radius: 5px;
+            box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
+            background-color: oldlace;
+            cursor: pointer;
+            transition: background 0.8s, transform 0.8s;
+
+        }
+        .productCard:hover{
+            background-color: rgb(233, 196, 230);
+            
+        }
+
+        img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="navbar">
+        <input id="searchInput" type="text" placeholder=" 🔎 Search Something">
+        <button id="searchbtn" onclick="search()">Search</button>
+
+        <select id="sortSelect">
+            <option value="sort">Sort by</option>
+            <option value="priceLow">Price (Low to High)</option>
+            <option value="priceHigh">Price (High to Low)</option>
+        </select>
+        <button id="sortBtn" onclick="sortProducts()">Sort</button>
+    </div>
+    <div id="nav"></div>
+    <div id="productDiv"></div>
+
+    <script>
+
+        let displayProducts = document.querySelector("#productDiv");
+        let originalData = [];
+        let searchData = false;
+        let filteredData;
+
+        async function init() {
+            try {
+                let res = await fetch(`https://fakestoreapi.com/products`);
+                originalData = await res.json();
+                displayData(originalData);
+
+            } catch (error) {
+                console.log(error)
+            }
+
+        }
+
+        function displayData(data) {
+            let bag = '';
+            data.forEach(ele => {
+                bag += `
+                    <div class="productCard">
+                        <img src="${ele.image}" alt="">
+                        <h3>${ele.title}</h3>
+                        <p>${ele.description}</p>
+                        <h3>Price: $<span>${ele.price}</span></h3>
+                        <h4>${ele.category}</h4>
+                    </div>
+                `
+            });
+            displayProducts.innerHTML = bag;
+        }
+        function search() {
+            searchData = true;
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            filteredData = originalData.filter(product => {
+                const productName = product.title.toLowerCase();
+                return productName.includes(searchInput);
+            });
+            if (filteredData.length) {
+                displayData(filteredData);
+            } else {
+                alert("This Product is not available")
+            }     
+        }
+        init();
+        function sortProducts() {
+            const sortSelect = document.getElementById('sortSelect');
+            const selectedValue = sortSelect.value;
+            let sortedData = searchData ? filteredData : originalData
+            console.log(sortedData)
+            if (sortedData.length) {
+
+                switch (selectedValue) {
+                    case 'priceLow':
+                        sortedData = sortedData.sort((a, b) => a.price - b.price)
+                        break;
+                    case 'priceHigh':
+                        sortedData = sortedData.sort((a, b) => b.price - a.price)
+                        break;
+                    default:
+                        sortedData = sortedData
+                        break;
+                }
+                displayData(sortedData)
+            }else{
+                alert(" This Product in not available...Search another Product.")
+            }
+
+        }
+
+        init()
+
+    </script>
+</body>
+
+</html>
