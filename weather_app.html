@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            /* background: url(https://weatherdownload.com/wp-content/uploads/2020/03/weather-checking.jpg)no-repeat; */
+            background-color: whitesmoke;
+        }
+
+        #nav {
+            display: flex;
+            height: 30px;
+            align-items: center;
+            background-color: black;
+
+        }
+
+        #head {
+            display: flex;
+            height: 60px;
+            align-items: center;
+            background-color: rgb(219, 163, 123);
+
+        }
+
+        #searchInput {
+            width: 35%;
+            padding: 5px;
+            margin-left: 30px;
+            font-size: 20px;
+            border-radius: 5px;
+            border: none;
+            height: 25px;
+        }
+
+        #searchbtn {
+            font-size: 18px;
+            border: none;
+            padding: 5px;
+            width: 100px;
+            height: 35px;
+            border-radius: 10px;
+            cursor: pointer;
+            color: white;
+            gap: 0;
+            background-color: rgb(94, 92, 92);
+        }
+
+        #searchbtn:hover {
+            background-color: rgb(137, 136, 136);
+        }
+
+        #btn_wea {
+            margin-left: 220px;
+        }
+
+        #btn {
+            font-size: 15px;
+            border: none;
+            padding: 8px;
+            border-radius: 7px;
+            cursor: pointer;
+            margin-right: 30px;
+            transition: background 0.5s, transform 0.5s;
+        }
+
+        #btn:hover {
+            background-color: white;
+        }
+
+        #nav_head {
+            background-color: rgb(249, 247, 247);
+
+        }
+
+        #nav_btn {
+            font-size: 15px;
+            border: none;
+            padding: 7px;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: background 0.8s, transform 0.8s;
+        }
+
+        #nav_btn:hover {
+            background-color: white;
+        }
+
+        #display {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        #date {
+            /* color: rgba(212, 12, 12, 0.664); */
+            margin-left: 10px;
+
+        }
+
+        .weather-detail {
+            display: flex;
+            position: relative;
+            border-radius: 10px;
+            padding: 3px;
+            /* border: 2px solid red; */
+            /* box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px; */
+        }
+
+        .weather-icon {
+            width: 20px;
+            height: 20px;
+            padding: 0px;
+        }
+
+        .weather-label {
+            font-size: 10px;
+            margin-left: 0;
+            padding: 0px;
+        }
+
+        .weather-value {
+            font-weight: bold;
+
+        }
+
+        img {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+            margin-left: 10px;
+
+        }
+
+        h3 {
+            margin: 0px;
+            padding: 0px;
+        }
+
+        h1 {
+            margin-top: 3px;
+            margin-bottom: 5px;
+            padding: 0px;
+        }
+        #map{
+            /* border: 3px solid red; */
+            height: 400px;
+            width: 500px;
+            margin-top: 10px;
+            box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="nav"></div>
+    <div id="head">
+        <input id="searchInput" type="text" placeholder="  search city">
+        <button id="searchbtn" onclick="search()">Search</button>
+
+        <div id="btn_wea">
+
+            <button id="btn" onclick="weather()">Different Weather?</button>
+        </div>
+        <div id="nav_head">
+            <button id="nav_btn" onclick="metric()">Metric: °C,m/s</button>
+            <button id="nav_btn" onclick="imperial()">Imperial: °F,mph</button>
+        </div>
+    </div>
+    <div id="display">
+        <div>
+
+        </div>
+        <div id="date"></div>
+        <div id="map">
+            <div class="mapouter">
+                <div class="gmap_canvas"><iframe width="600" height="500" id="gmap_canvas"
+                        src="https://maps.google.com/maps?q=2880%20Broadway,bhopal&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                        frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe><br>
+                    <style>
+                        .mapouter {
+                            position: relative;
+                            text-align: right;
+                            height: 500px;
+                            width: 600px;
+                        }
+                    </style><a href="https://www.embedgooglemap.net"></a>
+                    <style>
+                        .gmap_canvas {
+                            overflow: hidden;
+                            background: none !important;
+                            height: 400px;
+                            width: 500px;
+                        }
+                    </style>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+<script>
+    let screen = document.querySelector("#display >:first-child")
+    let latitude;
+    let longitude;
+    let apiKey = "3f7818713fcb7b70d4ec7926e523dbec"
+    let searchInput = document.getElementById("searchInput");
+    let map = document.querySelector("iframe")
+    async function getCoordinates() {
+        let res = await fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${searchInput.value}&appid=${apiKey}`)
+        let coordinates = await res.json();
+        console.log(coordinates[0])
+        latitude = coordinates[0].lat
+        longitude = coordinates[0].lon 
+        getData()  
+    }
+    function search() { 
+        getCoordinates()
+        map.src = `https://maps.google.com/maps?q=2880%20Broadway,${searchInput.value}&t=&z=13&ie=UTF8&iwloc=&output=embed`
+    }
+
+    async function getData() {
+        let res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}`)
+        let data = await res.json()
+        console.log(data);
+        console.log(latitude, longitude)
+        displayData(data)
+
+    }
+    function displayDate() {
+        const dateElement = document.getElementById('date');
+        const currentDate = new Date().toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        dateElement.innerText = ` ${currentDate}`;
+    }
+
+    displayDate()
+
+    function displayData(data) {
+
+        screen.innerHTML = '';
+
+        let tempCard = document.createElement("div");
+        let place = document.createElement("h1");
+        place.innerText = `${data.name}, ${data.sys.country}`;
+        tempCard.appendChild(place);
+
+        screen.appendChild(tempCard);
+
+        let weatherDetails = document.createElement("div");
+
+
+        let details = [
+            { label: "", value: new Date(data.sys.sunrise * 1000).toLocaleTimeString(), icon: "https://cdn-icons-png.flaticon.com/128/7774/7774377.png" },
+            { label: "", value: new Date(data.sys.sunset * 1000).toLocaleTimeString(), icon: "https://www.svgrepo.com/show/368350/sunset.svg" },
+            { label: "Min Temp", value: `: ${data.main.temp_min} °K`, icon: "https://tse4.mm.bing.net/th?id=OIP.f8B18A2lLinyEFs_MKafjAHaHa&pid=Api&P=0&h=180" },
+            { label: "Max Temp", value: `: ${data.main.temp_max} °K`, icon: "https://tse2.mm.bing.net/th?id=OIP.AHGZ8J2fTvHLUsbRK3Yx8QHaJj&pid=Api&P=0&h=180" },
+            { label: "Humidity", value: `: ${data.main.humidity}%`, icon: "https://cdn-icons-png.flaticon.com/128/2903/2903592.png" },
+            { label: "Cloud", value: `: ${data.clouds.all}%`, icon: "https://cdn-icons-png.flaticon.com/128/414/414927.png" },
+            { label: "Wind", value: `: ${data.wind.speed} m/s`, icon: "https://cdn-icons-png.flaticon.com/128/1506/1506761.png" },
+            { label: "Pressure", value: `: ${data.main.pressure} hPa`, icon: "https://cdn-icons-png.flaticon.com/128/4115/4115904.png" },
+            { label: "Timezone", value: `GMT: ${data.timezone / 3600}`, icon: "https://tse1.mm.bing.net/th?id=OIP.K59I2b_-MPKlQcn-F1SrRAHaHa&pid=Api&P=0&h=180" },
+            { label: "Visibility", value: `: ${data.visibility} meters`, icon: "https://cdn-icons-png.flaticon.com/128/2210/2210317.png" },
+            { label: "Feels Like", value: `: ${data.main.feels_like} °K`, icon: "data:image/png;base64,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" },
+            { label: "Weather", value: `: ${data.weather[0].description}`, icon: "https://cdn-icons-png.flaticon.com/128/1163/1163657.png" }
+        ];
+       
+
+        details.forEach(detail => {
+            let detailDiv = document.createElement("div");
+            detailDiv.className = "weather-detail";
+            detailDiv.innerHTML = `<img src="${detail.icon}" alt="${detail.label}" class="icon">
+                                   <h3>${detail.label} <span>${detail.value}</span></h3>`;
+            weatherDetails.appendChild(detailDiv);
+        });
+
+
+        screen.appendChild(weatherDetails);
+    }
+
+
+
+
+</script>
+
+</html>
