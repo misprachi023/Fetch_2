@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todos</title>
+
+    <style>
+     table{
+         width: 80%;
+         margin-left: 30px;
+         box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+        }
+      tr>th {
+          border: 3px solid #debdbd;
+          background-color: #7CC8C3;
+          font-size: 20px;
+          font-weight: 800;
+          
+        }
+
+       th,td {
+         padding: 7px;
+
+        }
+      tbody > tr:nth-child(even) {
+          background-color: #fad2cd;
+      }
+       tbody > tr {
+        background-color:#FCF4E4 ;
+
+       }
+      tr :nth-child(1){
+         text-align: center;
+        }
+        tr :nth-child(3){
+         text-align: center;
+        }
+
+       
+    </style>
+</head> 
+<body>
+    <table>
+        <tr>
+          <th>Id</th>
+          <th>Title</th>
+          <th>Status</th>
+        </tr>
+      <tbody id="display"></tbody>
+    </table>
+</body>
+<script>
+    async function requestData() {
+  let response = await fetch("https://jsonplaceholder.typicode.com/todos");
+  let data = await response.json();
+  displayData(data);
+  console.log(data);
+}
+
+const displayData = (info) => {
+  let showData = document.getElementById("display");
+  info.forEach(({ id, title, completed }) => {
+    let row = document.createElement("tr");
+    let showId = document.createElement("td");
+    let showTitle = document.createElement("td");
+    let showStatus = document.createElement("td");
+    showId.innerText = id;
+    showTitle.innerText = title;
+    showStatus.innerText = completed;
+    row.append(showId, showTitle, showStatus);
+    showData.append(row);
+  });
+};
+requestData();
+    
+</script>
+</html>
