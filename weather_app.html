@@ -256,13 +256,16 @@
         screen.appendChild(tempCard);
 
         let weatherDetails = document.createElement("div");
+        let tempMinCelsius = (data.main.temp_min - 273.15).toFixed(2);
+        let tempMaxCelsius = (data.main.temp_max - 273.15).toFixed(2);
 
-
+        data.tempMinCelsius = tempMinCelsius;
+        data.tempMaxCelsius = tempMaxCelsius;
         let details = [
             { label: "", value: new Date(data.sys.sunrise * 1000).toLocaleTimeString(), icon: "https://cdn-icons-png.flaticon.com/128/7774/7774377.png" },
             { label: "", value: new Date(data.sys.sunset * 1000).toLocaleTimeString(), icon: "https://www.svgrepo.com/show/368350/sunset.svg" },
-            { label: "Min Temp", value: `: ${data.main.temp_min} °K`, icon: "https://tse4.mm.bing.net/th?id=OIP.f8B18A2lLinyEFs_MKafjAHaHa&pid=Api&P=0&h=180" },
-            { label: "Max Temp", value: `: ${data.main.temp_max} °K`, icon: "https://tse2.mm.bing.net/th?id=OIP.AHGZ8J2fTvHLUsbRK3Yx8QHaJj&pid=Api&P=0&h=180" },
+            { label: "Min Temp", value: `: ${data.tempMinCelsius} °C`, icon: "https://tse4.mm.bing.net/th?id=OIP.f8B18A2lLinyEFs_MKafjAHaHa&pid=Api&P=0&h=180" },
+            { label: "Max Temp", value: `: ${data.tempMaxCelsius} °C`, icon: "https://tse2.mm.bing.net/th?id=OIP.AHGZ8J2fTvHLUsbRK3Yx8QHaJj&pid=Api&P=0&h=180" },
             { label: "Humidity", value: `: ${data.main.humidity}%`, icon: "https://cdn-icons-png.flaticon.com/128/2903/2903592.png" },
             { label: "Cloud", value: `: ${data.clouds.all}%`, icon: "https://cdn-icons-png.flaticon.com/128/414/414927.png" },
             { label: "Wind", value: `: ${data.wind.speed} m/s`, icon: "https://cdn-icons-png.flaticon.com/128/1506/1506761.png" },
