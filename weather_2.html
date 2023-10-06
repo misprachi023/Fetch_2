@@ -212,8 +212,7 @@
         displayForecast(forecastData);
     }
 
-
-    function displayForecast(data) {
+     function displayForecast(data) {
         const forecastSection = document.querySelector('.forecast');
         forecastSection.innerHTML = '';
 
@@ -224,20 +223,19 @@
             const date = new Date(data.list[i].dt * 1000);
             const formattedDate = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 
+            // Convert temperature from Kelvin to Celsius
+            const minTempCelsius = (data.list[i].main.temp_min - 273.15).toFixed(2);
+            const maxTempCelsius = (data.list[i].main.temp_max - 273.15).toFixed(2);
+
             const iconUrl = `https://openweathermap.org/img/wn/${data.list[i].weather[0].icon}.png`;
             forecastCard.innerHTML = `
                     <h4>${formattedDate}</h4>
                     <img src="${iconUrl}" alt="Weather icon">
                     <p>${data.list[i].weather[0].description}</p>
-                    <p>Min Temp: ${data.list[i].main.temp_min} °K</p>
-                    <p>Max Temp: ${data.list[i].main.temp_max} °K</p>
+                    <p>Min Temp: ${minTempCelsius} °C</p>
+                    <p>Max Temp: ${maxTempCelsius} °C</p>
                 `;
 
             forecastSection.appendChild(forecastCard);
         }
     }
-
-
-</script>
-
-</html>
